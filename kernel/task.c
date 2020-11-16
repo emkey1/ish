@@ -48,6 +48,26 @@ struct pid *pid_get_last_allocated() {
     return pid_get(last_allocated_pid);
 }
 
+dword_t get_count_of_blocked_tasks() {
+    dword_t res = 0;
+    for (int pid = 0; pid <= MAX_PID; pid++) {
+        if (pid_get_task(pid) && pid_get_task(pid)->io_block) {
+            res++;
+        }
+    }
+    return res;
+}
+
+dword_t get_count_of_alive_tasks() {
+    dword_t res = 0;
+    for (int pid = 0; pid <= MAX_PID; pid++) {
+        if (pid_get_task(pid)) {
+            res++;
+        }
+    }
+    return res;
+}
+
 struct task *task_create_(struct task *parent) {
     lock(&pids_lock);
     do {
