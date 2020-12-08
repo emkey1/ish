@@ -9,6 +9,7 @@
 
 __thread struct task *current;
 
+static dword_t last_allocated_pid = 0;
 static struct pid pids[MAX_PID + 1] = {};
 lock_t pids_lock = LOCK_INITIALIZER;
 
@@ -40,15 +41,41 @@ struct task *pid_get_task(dword_t id) {
     return task;
 }
 
+struct pid *pid_get_last_allocated() {
+    if (!last_allocated_pid) {
+        return NULL;
+    }
+    return pid_get(last_allocated_pid);
+}
+
+dword_t get_count_of_blocked_tasks() {
+    dword_t res = 0;
+    for (int pid = 0; pid <= MAX_PID; pid++) {
+        if (pid_get_task(pid) && pid_get_task(pid)->io_block) {
+            res++;
+        }
+    }
+    return res;
+}
+
+dword_t get_count_of_alive_tasks() {
+    dword_t res = 0;
+    for (int pid = 0; pid <= MAX_PID; pid++) {
+        if (pid_get_task(pid)) {
+            res++;
+        }
+    }
+    return res;
+}
+
 struct task *task_create_(struct task *parent) {
     lock(&pids_lock);
-    static int cur_pid = 0;
     do {
-        cur_pid++;
-        if (cur_pid > MAX_PID) cur_pid = 1;
-    } while (!pid_empty(&pids[cur_pid]));
-    struct pid *pid = &pids[cur_pid];
-    pid->id = cur_pid;
+        last_allocated_pid++;
+        if (last_allocated_pid > MAX_PID) last_allocated_pid = 1;
+    } while (!pid_empty(&pids[last_allocated_pid]));
+    struct pid *pid = &pids[last_allocated_pid];
+    pid->id = last_allocated_pid;
     list_init(&pid->session);
     list_init(&pid->pgroup);
 
