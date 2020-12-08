@@ -636,8 +636,10 @@ int_t sys_rt_sigsuspend(addr_t mask_addr, uint_t size) {
 
 int_t sys_pause() {
     lock(&current->sighand->lock);
-    while (wait_for(&current->pause, &current->sighand->lock, NULL) != _EINTR)
-        continue;
+    TASK_MAY_BLOCK {
+        while (wait_for(&current->pause, &current->sighand->lock, NULL) != _EINTR)
+            continue;
+    }
     unlock(&current->sighand->lock);
     return _EINTR;
 }
