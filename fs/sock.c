@@ -5,7 +5,6 @@
 #include <sys/stat.h>
 #include <sys/un.h>
 #include "kernel/calls.h"
-#include "kernel/task.h"
 #include "fs/fd.h"
 #include "fs/inode.h"
 #include "fs/path.h"
@@ -410,16 +409,14 @@ int_t sys_accept(fd_t sock_fd, addr_t sockaddr_addr, addr_t sockaddr_len_addr) {
 
     char sockaddr[sockaddr_len];
     int client;
-    TASK_MAY_BLOCK {
-        do {
-            sockrestart_begin_listen_wait(sock);
-            errno = 0;
-            client = accept(sock->real_fd,
-                            sockaddr_addr != 0 ? (void *) sockaddr : NULL,
-                            sockaddr_addr != 0 ? &sockaddr_len : NULL);
-            sockrestart_end_listen_wait(sock);
-        } while (sockrestart_should_restart_listen_wait() && errno == EINTR);
-    }
+    do {
+        sockrestart_begin_listen_wait(sock);
+        errno = 0;
+        client = accept(sock->real_fd,
+                sockaddr_addr != 0 ? (void *) sockaddr : NULL,
+                sockaddr_addr != 0 ? &sockaddr_len : NULL);
+        sockrestart_end_listen_wait(sock);
+    } while (sockrestart_should_restart_listen_wait() && errno == EINTR);
     if (client < 0)
         return errno_map();
 
@@ -592,11 +589,8 @@ int_t sys_sendto(fd_t sock_fd, addr_t buffer_addr, dword_t len, dword_t flags, a
             goto error;
     }
 
-    ssize_t res = 0;
-    TASK_MAY_BLOCK {
-        res = sendto(sock->real_fd, buffer, len, real_flags,
-                     sockaddr_addr ? (void *) &sockaddr : NULL, sockaddr_len);
-    }
+    ssize_t res = sendto(sock->real_fd, buffer, len, real_flags,
+            sockaddr_addr ? (void *) &sockaddr : NULL, sockaddr_len);
     free(buffer);
     if (res < 0)
         return errno_map();
@@ -622,12 +616,9 @@ int_t sys_recvfrom(fd_t sock_fd, addr_t buffer_addr, dword_t len, dword_t flags,
 
     char *buffer = malloc(len);
     char sockaddr[sockaddr_len];
-    ssize_t res = 0;
-    TASK_MAY_BLOCK {
-        res = recvfrom(sock->real_fd, buffer, len, real_flags,
-                       sockaddr_addr != 0 ? (void *) sockaddr : NULL,
-                       sockaddr_len_addr != 0 ? &sockaddr_len : NULL);
-    }
+    ssize_t res = recvfrom(sock->real_fd, buffer, len, real_flags,
+            sockaddr_addr != 0 ? (void *) sockaddr : NULL,
+            sockaddr_len_addr != 0 ? &sockaddr_len : NULL);
     if (res < 0) {
         free(buffer);
         return errno_map();
@@ -955,9 +946,7 @@ int_t sys_sendmsg(fd_t sock_fd, addr_t msghdr_addr, int_t flags) {
     if (real_flags < 0)
         goto out_free_scm;
 
-    TASK_MAY_BLOCK {
-        err = sendmsg(sock->real_fd, &msg, real_flags);
-    }
+    err = sendmsg(sock->real_fd, &msg, real_flags);
     if (err < 0) {
         err = errno_map();
         goto out_free_scm;
@@ -1029,10 +1018,7 @@ int_t sys_recvmsg(fd_t sock_fd, addr_t msghdr_addr, int_t flags) {
         msg_iov[i].iov_base = malloc(msg_iov_fake[i].len);
     }
 
-    ssize_t res = 0;
-    TASK_MAY_BLOCK {
-        res = recvmsg(sock->real_fd, &msg, real_flags);
-    }
+    ssize_t res = recvmsg(sock->real_fd, &msg, real_flags);
     int err = 0;
     if (res < 0)
         err = errno_map();
