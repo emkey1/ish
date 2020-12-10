@@ -1,0 +1,67 @@
+lane :beta do
+    app_store_connect_api_key
+    setup_ci
+    sync_code_signing
+    sync_code_signing(type: 'appstore')
+
+    changelog = File.read('changelog.txt')
+    last_tag = `git describe --tags --abbrev=0 --match builds/\*`.chomp
+    testflight_changelog = changelog + "\n" + File.read("footer.txt") + `git shortlog #{last_tag}..HEAD`
+
+    latest = latest_testflight_build_number.to_s.scan(/^\d+(?=\.|$)/).first.to_i
+    build_number = latest + 1
+    increment_build_number(build_number: build_number)
+    commit_version_bump(
+        xcodeproj: 'iSH.xcodeproj',
+        message: "Release build #{build_number} to testflight",
+        include: "fastlane/changelog.txt",
+        force: true,
+    )
+    tag = "builds/#{build_number}"
+    add_git_tag(tag: tag)
+
+    # do this after commiting the version bump but before building the app
+    if is_ci
+      update_code_signing_settings(
+        path: 'iSH.xcodeproj',
+        targets: 'iSH',
+        use_automatic_signing: false,
+        profile_uuid: ENV['sigh_app.ish.iSH_development'],
+      )
+      update_code_signing_settings(
+        path: 'iSH.xcodeproj',
+        targets: 'iSHFileProvider',
+        use_automatic_signing: false,
+        profile_uuid: ENV['sigh_app.ish.iSH.FileProvider_development'],
+      )
+    end
+
+    build_app(
+      project: 'iSH.xcodeproj',
+      scheme: 'iSH',
+    )
+    upload_to_testflight(
+        changelog: testflight_changelog,
+        distribute_external: true,
+        groups: ["People"]
+    )
+
+    push_to_git_remote
+    set_github_release(
+        repository_name: 'ish-app/ish',
+        tag_name: tag,
+        commitish: nil, # the tag better exist
+        name: "Build #{build_number}",
+        description: changelog,
+        upload_assets: ['iSH.ipa'],
+        api_token: ENV['GH_TOKEN'],
+    )
+    slack(
+        message: "New build available!",
+        default_payloads: [],
+        payload: {
+            "Changelog" => changelog
+        },
+        use_webhook_configured_username_and_icon: true,
+     )
+end
