@@ -63,7 +63,6 @@ CFTimeInterval getSystemUptime(void)
 struct uptime_info get_uptime() {
     uint64_t kern_boottime[2];
     size_t size = sizeof(kern_boottime);
-    sysctlbyname("kern.boottime", &kern_boottime, &size, NULL, 0);
 
     struct {
         uint32_t ldavg[3];
@@ -81,8 +80,7 @@ struct uptime_info get_uptime() {
     }
     
     struct uptime_info uptime = {
-        //.uptime_ticks = now.tv_sec - kern_boottime[0],
-        .uptime_ticks = getSystemUptime() * 100, // This works but shouldn't.  -mke
+        .uptime_ticks = getSystemUptime() * 100,
         .load_1m = vm_loadavg.ldavg[0],
         .load_5m = vm_loadavg.ldavg[1],
         .load_15m = vm_loadavg.ldavg[2],
