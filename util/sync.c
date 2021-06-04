@@ -4,6 +4,7 @@
 #include "util/sync.h"
 #include "debug.h"
 #include "kernel/errno.h"
+extern pthread_mutex_t global_lock;
 
 void cond_init(cond_t *cond) {
     pthread_condattr_t attr;

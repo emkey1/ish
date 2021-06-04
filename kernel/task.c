@@ -6,7 +6,6 @@
 #include "kernel/task.h"
 #include "emu/memory.h"
 #include "emu/tlb.h"
-#include "kernel/global.h"
 #include <pthread.h>
 
 pthread_mutex_t global_lock = PTHREAD_MUTEX_INITIALIZER;
@@ -142,17 +141,10 @@ void task_run_current() {
     tlb_refresh(&tlb, &current->mem->mmu);
 
     while (true) {
-/*        struct timespec mytime;
-        mytime.tv_sec = 0;
-        mytime.tv_nsec = 1;
-        
-        while(pthread_mutex_trylock(&global_lock)) { // sleep, try again
-            nanosleep(&mytime , &mytime);
-        } */
+        pthread_mutex_lock(&global_lock);
         read_wrlock(&current->mem->lock);
         int interrupt = cpu_run_to_interrupt(cpu, &tlb);
-
-        // pthread_mutex_unlock(&global_lock); 
+        pthread_mutex_unlock(&global_lock);
         read_wrunlock(&current->mem->lock);
         
         handle_interrupt(interrupt);

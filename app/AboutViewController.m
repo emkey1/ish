@@ -73,13 +73,13 @@
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     UITableViewCell *cell = [tableView cellForRowAtIndexPath:indexPath];
     if (cell == self.sendFeedback) {
-        [UIApplication openURL:@"mailto:tblodt@icloud.com?subject=Feedback%20for%20iSH"];
+        [UIApplication openURL:@"mailto:emkey1@gmail.com?subject=Feedback%20for%20iSH-AOK"];
     } else if (cell == self.openGithub) {
-        [UIApplication openURL:@"https://github.com/ish-app/ish"];
+        [UIApplication openURL:@"https://github.com/emkey1/ish-AOK"];
     } else if (cell == self.openTwitter) {
         [UIApplication openURL:@"https://twitter.com/tblodt"];
     } else if (cell == self.openDiscord) {
-        [UIApplication openURL:@"https://discord.gg/HFAXj44"];
+        [UIApplication openURL:@"https://discord.com/channels/776432683302649866/837386560500269116"];
     } else if (cell == self.exportContainerCell) {
         // copy the files to the app container so they can be extracted from iTunes file sharing
         NSURL *container = ContainerURL();

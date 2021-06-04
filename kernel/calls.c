@@ -12,6 +12,8 @@ dword_t syscall_success_stub() {
     return 0;
 }
 
+extern pthread_mutex_t global_lock;
+
 #if is_gcc(8)
 #pragma GCC diagnostic ignored "-Wcast-function-type"
 #endif
@@ -254,7 +256,9 @@ void handle_interrupt(int interrupt) {
                 printk("%d stub syscall %d\n", current->pid, syscall_num);
             }
             STRACE("%d call %-3d ", current->pid, syscall_num);
+            //pthread_mutex_lock(&global_lock);
             int result = syscall_table[syscall_num](cpu->ebx, cpu->ecx, cpu->edx, cpu->esi, cpu->edi, cpu->ebp);
+            //pthread_mutex_unlock(&global_lock);
             STRACE(" = 0x%x\n", result);
             cpu->eax = result;
         }
