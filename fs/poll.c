@@ -415,10 +415,7 @@ static int real_poll_update(struct real_poll *real, int fd, int types, void *dat
 }
 
 static int real_poll_wait(struct real_poll *real, struct real_poll_event *events, int max, struct timespec *timeout) {
-    struct timespec mytime;
-    mytime.tv_sec = 0;
-    mytime.tv_nsec = 0;
-    return kevent(real->fd, NULL, 0, (struct kevent *) events, max, &mytime);
+    return kevent(real->fd, NULL, 0, (struct kevent *) events, max, timeout);
 }
 
 static void *rpe_data(struct real_poll_event *rpe) {

@@ -141,10 +141,8 @@ void task_run_current() {
     tlb_refresh(&tlb, &current->mem->mmu);
 
     while (true) {
-        pthread_mutex_lock(&global_lock);
         read_wrlock(&current->mem->lock);
         int interrupt = cpu_run_to_interrupt(cpu, &tlb);
-        pthread_mutex_unlock(&global_lock);
         read_wrunlock(&current->mem->lock);
         
         handle_interrupt(interrupt);
