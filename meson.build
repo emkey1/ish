@@ -33,9 +33,10 @@ includes = [include_directories('.')]
 threads = dependency('threads')
 librt = cc.find_library('rt', required: false)
 libm = cc.find_library('m', required: false)
-sqlite3 = cc.find_library('sqlite3')
+#sqlite3 = cc.find_library('sqlite3')
 
-dependencies = [librt, libm, threads, sqlite3]
+#dependencies = [librt, libm, threads, sqlite3]
+dependencies = [librt, libm, threads]
 
 subdir('vdso') # ish depends on the vdso
 

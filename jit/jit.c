@@ -9,6 +9,7 @@
 #include "util/list.h"
 
 extern int current_pid(void);
+extern pthread_mutex_t global_lock;
 
 static void jit_block_disconnect(struct jit *jit, struct jit_block *block);
 static void jit_block_free(struct jit *jit, struct jit_block *block);
@@ -202,6 +203,7 @@ static int cpu_step_to_interrupt(struct cpu_state *cpu, struct tlb *tlb) {
             cache[cache_index] = block;
             unlock(&jit->lock);
         }
+        
         struct jit_block *last_block = frame->last_block;
         if (last_block != NULL &&
                 (last_block->jump_ip[0] != NULL ||
@@ -257,7 +259,8 @@ static int cpu_single_step(struct cpu_state *cpu, struct tlb *tlb) {
     return interrupt;
 }
 
-int cpu_run_to_interrupt(struct cpu_state *cpu, struct tlb *tlb) {
+int cpu_run_to_interrupt(struct cpu_state *cpu, struct tlb *tlb, struct mem *mem) {
+    read_wrlock(&mem->lock);
     tlb_refresh(tlb, cpu->mmu);
     int interrupt = (cpu->tf ? cpu_single_step : cpu_step_to_interrupt)(cpu, tlb);
     cpu->trapno = interrupt;
@@ -269,13 +272,14 @@ int cpu_run_to_interrupt(struct cpu_state *cpu, struct tlb *tlb) {
         // this point, so they will all clear out their block pointers
         // TODO: use RCU for better performance
         unlock(&jit->lock); // Causes deadlock in some circumstances when enabled.  -mke
-        
         write_wrlock(&jit->jetsam_lock);
+        
         lock(&jit->lock); // Causes deadlock in some circumstances when enabled.  -mke
         jit_free_jetsam(jit);
         write_wrunlock(&jit->jetsam_lock);
     }
     unlock(&jit->lock);
-
+    
+    read_wrunlock(&mem->lock);
     return interrupt;
 }

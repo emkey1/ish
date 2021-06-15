@@ -8,6 +8,10 @@
 #include "misc.h"
 #include "debug.h"
 
+extern pthread_mutex_t my_read_lock;
+extern pthread_mutex_t my_write_lock;
+
+
 // locks, implemented using pthread
 
 #define LOCK_DEBUG 0
@@ -131,6 +135,7 @@ static inline void write_wrlock(wrlock_t *lock) {
 static inline void write_wrunlock(wrlock_t *lock) {
     if (pthread_rwlock_unlock(lock) != 0) __builtin_trap();
 }
+
 
 extern __thread sigjmp_buf unwind_buf;
 extern __thread bool should_unwind;

@@ -15,6 +15,7 @@
 #include "kernel/vdso.h"
 #include "kernel/task.h"
 #include "fs/fd.h"
+extern pthread_mutex_t global_lock;
 
 // increment the change count
 static void mem_changed(struct mem *mem);
@@ -278,8 +279,10 @@ void *mem_ptr(struct mem *mem, addr_t addr, int type) {
             // copy/paste from above
             read_wrunlock(&mem->lock);
             write_wrlock(&mem->lock);
+            
             memcpy(copy, data, PAGE_SIZE);
             pt_map(mem, page, 1, copy, 0, entry->flags &~ P_COW);
+      
             write_wrunlock(&mem->lock);
             read_wrlock(&mem->lock);
         }

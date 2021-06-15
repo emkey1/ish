@@ -9,7 +9,13 @@
 #include <pthread.h>
 
 pthread_mutex_t global_lock = PTHREAD_MUTEX_INITIALIZER;
-//pthread_mutex_t global_lock;
+pthread_mutex_t my_rw_lock = PTHREAD_MUTEX_INITIALIZER;
+pthread_mutex_t my_read_lock = PTHREAD_MUTEX_INITIALIZER;
+pthread_mutex_t my_write_lock = PTHREAD_MUTEX_INITIALIZER;
+
+//pthread_mutex_t my_urw_lock = PTHREAD_MUTEX_INITIALIZER;
+//pthread_mutex_t my_uread_lock = PTHREAD_MUTEX_INITIALIZER;
+//pthread_mutex_t my_uwrite_lock = PTHREAD_MUTEX_INITIALIZER;
 
 __thread struct task *current;
 
@@ -137,13 +143,11 @@ void task_destroy(struct task *task) {
 
 void task_run_current() {
     struct cpu_state *cpu = &current->cpu;
-    struct tlb tlb;
+    struct tlb tlb = {};
     tlb_refresh(&tlb, &current->mem->mmu);
 
     while (true) {
-        read_wrlock(&current->mem->lock);
-        int interrupt = cpu_run_to_interrupt(cpu, &tlb);
-        read_wrunlock(&current->mem->lock);
+        int interrupt = cpu_run_to_interrupt(cpu, &tlb, current->mem);
         
         handle_interrupt(interrupt);
     }

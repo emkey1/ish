@@ -9,6 +9,8 @@
 #include "kernel/init.h"
 #include "kernel/personality.h"
 
+extern pthread_mutex_t global_lock;
+
 int mount_root(const struct fs_ops *fs, const char *source) {
     char source_realpath[MAX_PATH + 1];
     if (realpath(source, source_realpath) == NULL)
@@ -99,14 +101,15 @@ int become_first_process() {
     return 0;
 }
 
-int become_new_init_child() {
+int become_new_init_child() { //DEBUG
     // locking? who needs locking?!
     struct task *init = pid_get_task(1);
     assert(init != NULL);
 
     struct task *task = construct_task(init);
-    if (IS_ERR(task))
+    if (IS_ERR(task)) {
         return PTR_ERR(task);
+    }
 
     // these are things we definitely don't want to inherit
     task->clear_tid = 0;

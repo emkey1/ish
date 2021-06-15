@@ -8,6 +8,8 @@
 #include "fs/fd.h"
 #include "fs/tty.h"
 
+
+
 static void halt_system(void);
 
 static bool exit_tgroup(struct task *task) {
@@ -239,6 +241,7 @@ static bool notify_if_stopped(struct task *task, struct siginfo_ *info_out) {
 
 static bool reap_if_needed(struct task *task, struct siginfo_ *info_out, struct rusage_ *rusage_out, int options) {
     assert(task_is_leader(task));
+    
     if ((options & WUNTRACED_ && notify_if_stopped(task, info_out)) ||
         (options & WEXITED_ && reap_if_zombie(task, info_out, rusage_out, options))) {
         info_out->sig = SIGCHLD_;
