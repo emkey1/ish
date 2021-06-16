@@ -175,10 +175,12 @@ static int proc_pid_stat_show(struct proc_entry *entry, struct proc_data *buf) {
     uint32_t ignored = 0;
     uint32_t caught = 0;
     for (int i = 0; i < 32; i++) {
-        if (task->sighand->action[i].handler == SIG_IGN_)
-            ignored |= 1l << i;
-        else if (task->sighand->action[i].handler != SIG_DFL_)
-            caught |= 1l << i;
+        if (task->sighand != NULL) { // MKE, this should never happen
+            if (task->sighand->action[i].handler == SIG_IGN_)
+                ignored |= 1l << i;
+            else if (task->sighand->action[i].handler != SIG_DFL_)
+                caught |= 1l << i;
+        }
     }
     proc_printf(buf, "%lu ", (unsigned long) ignored);
     proc_printf(buf, "%lu ", (unsigned long) caught);

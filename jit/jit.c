@@ -176,17 +176,22 @@ static inline size_t jit_cache_hash(addr_t ip) {
     return (ip ^ (ip >> 12)) % JIT_CACHE_SIZE;
 }
 
-static int cpu_step_to_interrupt(struct cpu_state *cpu, struct tlb *tlb) {
+static int cpu_step_to_interrupt(struct cpu_state *cpu, struct tlb *tlb, struct mem *mem) {
+    read_wrlock(&mem->lock);
     struct jit *jit = cpu->mmu->jit;
+    read_wrunlock(&mem->lock);
     read_wrlock(&jit->jetsam_lock);
 
     struct jit_block **cache = calloc(JIT_CACHE_SIZE, sizeof(*cache));
     struct jit_frame *frame = malloc(sizeof(struct jit_frame));
+    read_wrlock(&mem->lock);
     memset(frame, 0, sizeof(*frame));
     frame->cpu = *cpu;
     assert(jit->mmu == cpu->mmu);
+    read_wrunlock(&mem->lock);
 
     int interrupt = INT_NONE;
+    read_wrlock(&mem->lock);
     while (interrupt == INT_NONE) {
         addr_t ip = frame->cpu.eip;
         size_t cache_index = jit_cache_hash(ip);
@@ -220,7 +225,6 @@ static int cpu_step_to_interrupt(struct cpu_state *cpu, struct tlb *tlb) {
                     }
                 }
             }
-
             unlock(&jit->lock);
         }
         frame->last_block = block;
@@ -229,8 +233,9 @@ static int cpu_step_to_interrupt(struct cpu_state *cpu, struct tlb *tlb) {
         // every thread on this jit is not executing anything
 
         TRACE("%d %08x --- cycle %ld\n", current_pid(), ip, frame->cpu.cycle);
-
+        //lock(&jit->lock); //MKE
         interrupt = jit_enter(block, frame, tlb);
+        //unlock(&jit->lock); //MKE
         if (interrupt == INT_NONE && ++frame->cpu.cycle % (1 << 10) == 0)
             interrupt = INT_TIMER;
         *cpu = frame->cpu;
@@ -239,10 +244,12 @@ static int cpu_step_to_interrupt(struct cpu_state *cpu, struct tlb *tlb) {
     free(frame);
     free(cache);
     read_wrunlock(&jit->jetsam_lock);
+    read_wrunlock(&mem->lock);
     return interrupt;
 }
 
-static int cpu_single_step(struct cpu_state *cpu, struct tlb *tlb) {
+static int cpu_single_step(struct cpu_state *cpu, struct tlb *tlb, struct mem *mem) {
+    read_wrlock(&mem->lock);
     struct gen_state state;
     gen_start(cpu->eip, &state);
     gen_step(&state, tlb);
@@ -256,13 +263,14 @@ static int cpu_single_step(struct cpu_state *cpu, struct tlb *tlb) {
     jit_block_free(NULL, block);
     if (interrupt == INT_NONE)
         interrupt = INT_DEBUG;
+    
+    read_wrunlock(&mem->lock);
     return interrupt;
 }
 
 int cpu_run_to_interrupt(struct cpu_state *cpu, struct tlb *tlb, struct mem *mem) {
-    read_wrlock(&mem->lock);
     tlb_refresh(tlb, cpu->mmu);
-    int interrupt = (cpu->tf ? cpu_single_step : cpu_step_to_interrupt)(cpu, tlb);
+    int interrupt = (cpu->tf ? cpu_single_step : cpu_step_to_interrupt)(cpu, tlb, mem);
     cpu->trapno = interrupt;
 
     struct jit *jit = cpu->mmu->jit;
@@ -280,6 +288,5 @@ int cpu_run_to_interrupt(struct cpu_state *cpu, struct tlb *tlb, struct mem *mem
     }
     unlock(&jit->lock);
     
-    read_wrunlock(&mem->lock);
     return interrupt;
 }

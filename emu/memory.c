@@ -280,8 +280,10 @@ void *mem_ptr(struct mem *mem, addr_t addr, int type) {
             read_wrunlock(&mem->lock);
             write_wrlock(&mem->lock);
             
-            memcpy(copy, data, PAGE_SIZE);
-            pt_map(mem, page, 1, copy, 0, entry->flags &~ P_COW);
+            if(data != NULL && copy != NULL) { //MKE DEBUG
+                memcpy(copy, data, PAGE_SIZE);
+                pt_map(mem, page, 1, copy, 0, entry->flags &~ P_COW);
+            }
       
             write_wrunlock(&mem->lock);
             read_wrlock(&mem->lock);
