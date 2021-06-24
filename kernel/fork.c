@@ -33,6 +33,8 @@
 #define IMPLEMENTED_FLAGS (CLONE_VM_|CLONE_FILES_|CLONE_FS_|CLONE_SIGHAND_|CLONE_SYSVSEM_|CLONE_VFORK_|CLONE_THREAD_|\
         CLONE_SETTLS_|CLONE_CHILD_SETTID_|CLONE_PARENT_SETTID_|CLONE_CHILD_CLEARTID_|CLONE_DETACHED_)
 
+extern pthread_mutex_t global_lock;
+
 static struct tgroup *tgroup_copy(struct tgroup *old_group) {
     struct tgroup *group = malloc(sizeof(struct tgroup));
     *group = *old_group;
@@ -185,9 +187,13 @@ dword_t sys_clone(dword_t flags, addr_t stack, addr_t ptid, addr_t tls, addr_t c
 
     if (flags & CLONE_VFORK_) {
         lock(&vfork.lock);
-        while (!vfork.done)
+        while (!vfork.done) {
             // FIXME this should stop waiting if a fatal signal is received
+            pthread_mutex_lock(&global_lock);
             wait_for_ignore_signals(&vfork.cond, &vfork.lock, NULL);
+            pthread_mutex_unlock(&global_lock);
+        }
+
         unlock(&vfork.lock);
         lock(&task->general_lock);
         task->vfork = NULL;
