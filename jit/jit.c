@@ -233,16 +233,17 @@ static int cpu_step_to_interrupt(struct cpu_state *cpu, struct tlb *tlb, struct 
         // every thread on this jit is not executing anything
 
         TRACE("%d %08x --- cycle %ld\n", current_pid(), ip, frame->cpu.cycle);
-        //lock(&jit->lock); //MKE
+  
         interrupt = jit_enter(block, frame, tlb);
-        //unlock(&jit->lock); //MKE
+
         if (interrupt == INT_NONE && ++frame->cpu.cycle % (1 << 10) == 0)
             interrupt = INT_TIMER;
         *cpu = frame->cpu;
     }
-
+    lock(&jit->lock); //MKE
     free(frame);
     free(cache);
+    unlock(&jit->lock); //MKE
     read_wrunlock(&jit->jetsam_lock);
     read_wrunlock(&mem->lock);
     return interrupt;

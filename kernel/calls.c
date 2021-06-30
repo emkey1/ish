@@ -8,6 +8,9 @@
 dword_t syscall_stub() {
     return _ENOSYS;
 }
+dword_t syscall_stub_silent() {
+    return _ENOSYS;
+}
 dword_t syscall_success_stub() {
     return 0;
 }
@@ -155,6 +158,7 @@ syscall_t syscall_table[] = {
     [212] = (syscall_t) sys_chown32,
     [213] = (syscall_t) sys_setuid,
     [214] = (syscall_t) sys_setgid,
+    [216] = (syscall_t) syscall_stub, // setfsgid32
     [219] = (syscall_t) sys_madvise,
     [220] = (syscall_t) sys_getdents64,
     [221] = (syscall_t) sys_fcntl,
@@ -227,6 +231,7 @@ syscall_t syscall_table[] = {
     [361] = (syscall_t) sys_bind,
     [362] = (syscall_t) sys_connect,
     [363] = (syscall_t) sys_listen,
+    [364] = (syscall_t) syscall_stub, // perf_event_open
     [365] = (syscall_t) sys_getsockopt,
     [366] = (syscall_t) sys_setsockopt,
     [367] = (syscall_t) sys_getsockname,
@@ -238,8 +243,9 @@ syscall_t syscall_table[] = {
     [373] = (syscall_t) sys_shutdown,
     [375] = (syscall_t) syscall_stub, // membarrier
     [377] = (syscall_t) sys_copy_file_range,
-    [383] = (syscall_t) syscall_stub,
+    [383] = (syscall_t) syscall_stub_silent, // seccomp
     [384] = (syscall_t) sys_arch_prctl,
+    [439] = (syscall_t) syscall_stub, // faccessat2
 };
 
 #define NUM_SYSCALLS (sizeof(syscall_table) / sizeof(syscall_table[0]))
@@ -254,6 +260,8 @@ void handle_interrupt(int interrupt) {
         } else {
             if (syscall_table[syscall_num] == (syscall_t) syscall_stub) {
                 printk("%d stub syscall %d\n", current->pid, syscall_num);
+            } else if (syscall_table[syscall_num] == (syscall_t) syscall_stub_silent) {
+                // Do nothing
             }
             STRACE("%d call %-3d ", current->pid, syscall_num);
             int result = syscall_table[syscall_num](cpu->ebx, cpu->ecx, cpu->edx, cpu->esi, cpu->edi, cpu->ebp);

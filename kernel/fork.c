@@ -190,6 +190,9 @@ dword_t sys_clone(dword_t flags, addr_t stack, addr_t ptid, addr_t tls, addr_t c
         while (!vfork.done) {
             // FIXME this should stop waiting if a fatal signal is received
             pthread_mutex_lock(&global_lock);
+            struct timespec mytime;
+            mytime.tv_sec = 10;
+            mytime.tv_nsec = 0;
             wait_for_ignore_signals(&vfork.cond, &vfork.lock, NULL);
             pthread_mutex_unlock(&global_lock);
         }

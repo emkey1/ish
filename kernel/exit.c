@@ -8,7 +8,7 @@
 #include "fs/fd.h"
 #include "fs/tty.h"
 
-
+extern pthread_mutex_t my_read_lock;
 
 static void halt_system(void);
 
@@ -317,6 +317,9 @@ retry:
         goto error;
 
     // no matching zombie found, wait for one
+    struct timespec mytime;
+    mytime.tv_sec = 5;
+    mytime.tv_nsec = 0;
     
     if (wait_for(&current->group->child_exit, &pids_lock, NULL)) {
         // maybe we got a SIGCHLD! go through the loop one more time to make

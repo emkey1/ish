@@ -172,7 +172,7 @@ dword_t sys_futex(addr_t uaddr, dword_t op, dword_t val, addr_t timeout_or_val2,
             struct timespec mytime;
             mytime.tv_sec = 10;
             mytime.tv_nsec = 0;
-            return futex_wait(uaddr, val, timeout_or_val2 ? &timeout : &mytime);
+            return futex_wait(uaddr, val, timeout_or_val2 ? &timeout : NULL);
         case FUTEX_WAKE_:
             STRACE("futex(FUTEX_WAKE, %#x, %d)", uaddr, val);
             return futex_wakelike(op & FUTEX_CMD_MASK_, uaddr, val, 0, 0);

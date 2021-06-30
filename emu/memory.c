@@ -272,13 +272,12 @@ void *mem_ptr(struct mem *mem, addr_t addr, int type) {
 #endif
         // if page is cow, ~~milk~~ copy it
         if (entry->flags & P_COW) {
+            // copy/paste from above
+            read_wrunlock(&mem->lock);//MKE, This and the following line were moved up here from below the next two lines
+            write_wrlock(&mem->lock); //MKE
             void *data = (char *) entry->data->data + entry->offset;
             void *copy = mmap(NULL, PAGE_SIZE, PROT_READ | PROT_WRITE,
                     MAP_PRIVATE | MAP_ANONYMOUS, 0, 0);
-
-            // copy/paste from above
-            read_wrunlock(&mem->lock);
-            write_wrlock(&mem->lock);
             
             if(data != NULL && copy != NULL) { //MKE DEBUG
                 memcpy(copy, data, PAGE_SIZE);

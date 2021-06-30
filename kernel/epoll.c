@@ -95,7 +95,7 @@ int_t sys_epoll_wait(fd_t epoll_f, addr_t events_addr, int_t max_events, int_t t
     STRACE("...\n");
     //int res = poll_wait(epoll->epollfd.poll, epoll_callback, &context, timeout < 0 ? NULL : &timeout_ts); // MKE DEBUG
     struct timespec mytime;
-    mytime.tv_sec = 10;
+    mytime.tv_sec = 5;
     mytime.tv_nsec = 0;
     int res = poll_wait(epoll->epollfd.poll, epoll_callback, &context, timeout < 0 ? &mytime : &timeout_ts);
     STRACE("%d end epoll_wait", current->pid);
