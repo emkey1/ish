@@ -1,6 +1,7 @@
 build/
 xcuserdata/
 .floo
+iSH.xcodeproj/project.pbxproj
 
 cross-*.txt
 root.tar.gz

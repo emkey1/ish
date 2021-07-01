@@ -207,6 +207,7 @@ syscall_t syscall_table[] = {
     [307] = (syscall_t) sys_faccessat,
     [308] = (syscall_t) sys_pselect,
     [309] = (syscall_t) sys_ppoll,
+    [310] = (syscall_t) syscall_stub, // unshare
     [311] = (syscall_t) sys_set_robust_list,
     [312] = (syscall_t) sys_get_robust_list,
     [313] = (syscall_t) sys_splice,
@@ -255,11 +256,11 @@ void handle_interrupt(int interrupt) {
     if (interrupt == INT_SYSCALL) {
         unsigned syscall_num = cpu->eax;
         if (syscall_num >= NUM_SYSCALLS || syscall_table[syscall_num] == NULL) {
-            printk("%d missing syscall %d\n", current->pid, syscall_num);
+            printk("%d(%s) missing syscall %d\n", current->pid, current->comm, syscall_num);
             deliver_signal(current, SIGSYS_, SIGINFO_NIL);
         } else {
             if (syscall_table[syscall_num] == (syscall_t) syscall_stub) {
-                printk("%d stub syscall %d\n", current->pid, syscall_num);
+                printk("%d(%s) stub syscall %d\n",current->pid, current->comm, syscall_num);
             } else if (syscall_table[syscall_num] == (syscall_t) syscall_stub_silent) {
                 // Do nothing
             }
@@ -276,7 +277,7 @@ void handle_interrupt(int interrupt) {
         };
         deliver_signal(current, SIGSEGV_, info);
     } else if (interrupt == INT_UNDEFINED) {
-        printk("%d illegal instruction at 0x%x: ", current->pid, cpu->eip);
+        printk("%d(%s) illegal instruction at 0x%x: ", current->pid, current->comm, cpu->eip);
         for (int i = 0; i < 8; i++) {
             uint8_t b;
             if (user_get(cpu->eip + i, b))
