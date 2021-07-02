@@ -76,8 +76,6 @@
         [UIApplication openURL:@"mailto:emkey1@gmail.com?subject=Feedback%20for%20iSH-AOK"];
     } else if (cell == self.openGithub) {
         [UIApplication openURL:@"https://github.com/emkey1/ish-AOK"];
-    } else if (cell == self.openTwitter) {
-        [UIApplication openURL:@"https://twitter.com/tblodt"];
     } else if (cell == self.openDiscord) {
         [UIApplication openURL:@"https://discord.com/channels/776432683302649866/837386560500269116"];
     } else if (cell == self.exportContainerCell) {

@@ -22,7 +22,7 @@ static NSString *const kPreferenceFontFamilyKey = @"Font Family";
 static NSString *const kPreferenceFontSizeKey = @"Font Size";
 static NSString *const kPreferenceSchemeKey = @"Scheme";
 static NSString *const kPreferenceSchemeDictKey = @"SchemeArray";
-static NSString *const kPreferenceDefaultSchemeName = @"Light";
+static NSString *const kPreferenceDefaultSchemeName = @"Amber";
 static NSString *const kPreferenceDisableDimmingKey = @"Disable Dimming";
 NSString *const kPreferenceLaunchCommandKey = @"Init Command";
 NSString *const kPreferenceBootCommandKey = @"Boot Command";
@@ -275,6 +275,10 @@ static UIColor *UnarchiveColor(id data) {
 
 + (NSDictionary<NSString *, Scheme *> *)presets {
     return @{
+        @"Amber":  [self _schemeWithForegroundColor:UIColor.orangeColor
+                                    backgroundColor:UIColor.blackColor
+                                             name: @"Amber"
+                                          palette:@[]],
          @"Light": [self _schemeWithForegroundColor:UIColor.blackColor
                                    backgroundColor:UIColor.whiteColor
                                               name:@"Light"
@@ -282,9 +286,6 @@ static UIColor *UnarchiveColor(id data) {
          @"Dark":  [self _schemeWithForegroundColor:UIColor.whiteColor
                                    backgroundColor:UIColor.blackColor
                                               name: @"Dark"
-                                           palette:@[]],
-         @"Amber":  [self _schemeWithForegroundColor:UIColor.orangeColor
-                                              name: @"Amber"
                                            palette:@[]],
          @"1337":  [self _schemeWithForegroundColor:UIColor.greenColor
                                    backgroundColor:UIColor.blackColor

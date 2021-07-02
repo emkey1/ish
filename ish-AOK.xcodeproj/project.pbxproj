@@ -260,14 +260,14 @@
 		};
 		BB88F4A32154760800A341FD /* Embed App Extensions */ = {
 			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
+			buildActionMask = 8;
 			dstPath = "";
 			dstSubfolderSpec = 13;
 			files = (
 				BB88F49F2154760800A341FD /* iSHFileProvider.appex in Embed App Extensions */,
 			);
 			name = "Embed App Extensions";
-			runOnlyForDeploymentPostprocessing = 0;
+			runOnlyForDeploymentPostprocessing = 1;
 		};
 /* End PBXCopyFilesBuildPhase section */
 
@@ -1290,10 +1290,6 @@
 					};
 					BB792B4F1F96D90D00FFB7A4 = {
 						CreatedOnToolsVersion = 9.0;
-<<<<<<< HEAD:ish-AOK.xcodeproj/project.pbxproj
-						ProvisioningStyle = Automatic;
-=======
->>>>>>> 98c640af539161da2c1c6b3cd335b48e3bc5cb53:iSH.xcodeproj/project.pbxproj
 						SystemCapabilities = {
 							com.apple.ApplicationGroups.iOS = {
 								enabled = 1;
@@ -1490,11 +1486,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-<<<<<<< HEAD:ish-AOK.xcodeproj/project.pbxproj
 			shellScript = "echo FOO";
-=======
-			shellScript = "curl -L \"https://$ROOTFS_URL\" -o \"$BUILT_PRODUCTS_DIR/$CONTENTS_FOLDER_PATH/root.tar.gz\"\n";
->>>>>>> 98c640af539161da2c1c6b3cd335b48e3bc5cb53:iSH.xcodeproj/project.pbxproj
 			showEnvVarsInLog = 0;
 		};
 		BBFB2C572590257E00545EAB /* ShellScript */ = {
@@ -1871,15 +1863,10 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = BB0B85A42586F1CB00208600 /* ProjectDebug.xcconfig */;
 			buildSettings = {
-<<<<<<< HEAD:ish-AOK.xcodeproj/project.pbxproj
 				CURRENT_PROJECT_VERSION = 3;
 				DEVELOPMENT_TEAM = UYU5FM4LQ4;
 				IPHONEOS_DEPLOYMENT_TARGET = 12.1;
 				MACOSX_DEPLOYMENT_TARGET = 11.3;
-=======
-				CURRENT_PROJECT_VERSION = 175;
-				DEVELOPMENT_TEAM = CK5SXRTBR7;
->>>>>>> 98c640af539161da2c1c6b3cd335b48e3bc5cb53:iSH.xcodeproj/project.pbxproj
 			};
 			name = Debug;
 		};
@@ -1887,16 +1874,11 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = BB0B85A52586F1E100208600 /* ProjectRelease.xcconfig */;
 			buildSettings = {
-<<<<<<< HEAD:ish-AOK.xcodeproj/project.pbxproj
 				CURRENT_PROJECT_VERSION = 3;
 				DEVELOPMENT_TEAM = UYU5FM4LQ4;
 				IPHONEOS_DEPLOYMENT_TARGET = 12.1;
 				MACOSX_DEPLOYMENT_TARGET = 11.3;
 				SWIFT_COMPILATION_MODE = wholemodule;
-=======
-				CURRENT_PROJECT_VERSION = 175;
-				DEVELOPMENT_TEAM = CK5SXRTBR7;
->>>>>>> 98c640af539161da2c1c6b3cd335b48e3bc5cb53:iSH.xcodeproj/project.pbxproj
 			};
 			name = Release;
 		};
@@ -1904,17 +1886,9 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = BB0B86CD2586FD8800208600 /* App.xcconfig */;
 			buildSettings = {
-<<<<<<< HEAD:ish-AOK.xcodeproj/project.pbxproj
 				CURRENT_PROJECT_VERSION = 19;
 				DEVELOPMENT_TEAM = UYU5FM4LQ4;
 				PRODUCT_BUNDLE_IDENTIFIER = "app.ish.iSH-AOK";
-=======
-				CODE_SIGN_IDENTITY = "Apple Development";
-				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = 7924VL9N7J;
-				PRODUCT_BUNDLE_IDENTIFIER = corban.iSH;
-				PROVISIONING_PROFILE_SPECIFIER = "";
->>>>>>> 98c640af539161da2c1c6b3cd335b48e3bc5cb53:iSH.xcodeproj/project.pbxproj
 			};
 			name = Debug;
 		};
@@ -1922,17 +1896,9 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = BB0B86CD2586FD8800208600 /* App.xcconfig */;
 			buildSettings = {
-<<<<<<< HEAD:ish-AOK.xcodeproj/project.pbxproj
 				CURRENT_PROJECT_VERSION = 19;
 				DEVELOPMENT_TEAM = UYU5FM4LQ4;
 				PRODUCT_BUNDLE_IDENTIFIER = "app.ish.iSH-AOK";
-=======
-				CODE_SIGN_IDENTITY = "Apple Development";
-				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = 7924VL9N7J;
-				PRODUCT_BUNDLE_IDENTIFIER = corban.iSH;
-				PROVISIONING_PROFILE_SPECIFIER = "";
->>>>>>> 98c640af539161da2c1c6b3cd335b48e3bc5cb53:iSH.xcodeproj/project.pbxproj
 			};
 			name = Release;
 		};
@@ -1941,13 +1907,9 @@
 			baseConfigurationReference = BB0B86D52587009D00208600 /* iOS.xcconfig */;
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = app/FileProvider/iSHFileProvider.entitlements;
-<<<<<<< HEAD:ish-AOK.xcodeproj/project.pbxproj
 				CURRENT_PROJECT_VERSION = 19;
-=======
-				DEVELOPMENT_TEAM = 7924VL9N7J;
->>>>>>> 98c640af539161da2c1c6b3cd335b48e3bc5cb53:iSH.xcodeproj/project.pbxproj
 				INFOPLIST_FILE = app/FileProvider/Info.plist;
-				PRODUCT_BUNDLE_IDENTIFIER = corban.iSH.FileProvider;
+				PRODUCT_BUNDLE_IDENTIFIER = "app.ish.iSH-AOKFileProvider";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 			};
@@ -1958,13 +1920,9 @@
 			baseConfigurationReference = BB0B86D52587009D00208600 /* iOS.xcconfig */;
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = app/FileProvider/iSHFileProvider.entitlements;
-<<<<<<< HEAD:ish-AOK.xcodeproj/project.pbxproj
 				CURRENT_PROJECT_VERSION = 19;
-=======
-				DEVELOPMENT_TEAM = 7924VL9N7J;
->>>>>>> 98c640af539161da2c1c6b3cd335b48e3bc5cb53:iSH.xcodeproj/project.pbxproj
 				INFOPLIST_FILE = app/FileProvider/Info.plist;
-				PRODUCT_BUNDLE_IDENTIFIER = corban.iSH.FileProvider;
+				PRODUCT_BUNDLE_IDENTIFIER = "app.ish.iSH-AOKFileProvider";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 			};
